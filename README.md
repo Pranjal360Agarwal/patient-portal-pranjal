@@ -24,7 +24,7 @@ This patient portal allows users to manage their medical documents (prescription
 
 ## Project Structure
 
-\`\`\`
+```
 ├── app/
 │ ├── api/
 │ │ └── documents/
@@ -46,7 +46,7 @@ This patient portal allows users to manage their medical documents (prescription
 │ └── utils.ts
 ├── design.md # Design document
 └── README.md
-\`\`\`
+```
 
 ---
 
@@ -60,7 +60,7 @@ This patient portal allows users to manage their medical documents (prescription
 
 ### Step-by-Step Installation
 
-\`\`\`bash
+```bash
 
 # 1. Clone the repository
 
@@ -80,7 +80,7 @@ npm run dev
 
 # 5. Open http://localhost:3000 in your browser
 
-\`\`\`
+```
 
 ---
 
@@ -95,72 +95,75 @@ npm run dev
 
 #### 1. Upload Document
 
-\`\`\`bash
+```bash
 POST /api/documents/upload
 Content-Type: multipart/form-data
 
 curl -X POST http://localhost:3000/api/documents/upload \
  -F "file=@/path/to/document.pdf"
-\`\`\`
+```
 
 **Response (201):**
-\`\`\`json
+
+```json
 {
-"message": "File uploaded successfully",
-"document": {
-"id": "abc123",
-"filename": "document.pdf",
-"filepath": "uploads/1702345678901-document.pdf",
-"filesize": 245678,
-"created_at": "2024-12-11T10:30:00.000Z"
+  "message": "File uploaded successfully",
+  "document": {
+    "id": "abc123",
+    "filename": "document.pdf",
+    "filepath": "uploads/1702345678901-document.pdf",
+    "filesize": 245678,
+    "created_at": "2024-12-11T10:30:00.000Z"
+  }
 }
-}
-\`\`\`
+```
 
 #### 2. List Documents
 
-\`\`\`bash
+```bash
 GET /api/documents
 
 curl http://localhost:3000/api/documents
-\`\`\`
+```
 
 **Response (200):**
-\`\`\`json
+
+```json
 {
-"documents": [
-{
-"id": "abc123",
-"filename": "prescription.pdf",
-"filesize": 245678,
-"created_at": "2024-12-11T10:30:00.000Z"
+  "documents": [
+    {
+      "id": "abc123",
+      "filename": "prescription.pdf",
+      "filesize": 245678,
+      "created_at": "2024-12-11T10:30:00.000Z"
+    }
+  ]
 }
-]
-}
-\`\`\`
+```
 
 #### 3. Download Document
 
-\`\`\`bash
+```bash
 GET /api/documents/:id
 
 curl http://localhost:3000/api/documents/abc123 --output document.pdf
-\`\`\`
+```
 
 #### 4. Delete Document
 
-\`\`\`bash
+```bash
 DELETE /api/documents/:id
 
 curl -X DELETE http://localhost:3000/api/documents/abc123
-\`\`\`
+```
 
 **Response (200):**
-\`\`\`json
+
+```json
 {
-"message": "Document deleted successfully"
+  "message": "Document deleted successfully"
 }
-\`\`\`
+```
 
 ---
 
