@@ -53,15 +53,16 @@ For this demo implementation, I used an in-memory Map-based storage to simulate 
 - **PostgreSQL**: For scalable production deployments - robust, supports concurrent connections, excellent for multi-user systems.
 
 **Schema Design**:
-\`\`\`sql
+
+```sql
 CREATE TABLE documents (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  filename VARCHAR(255) NOT NULL,
-  filepath VARCHAR(500) NOT NULL,
-  filesize INTEGER NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+filename VARCHAR(255) NOT NULL,
+filepath VARCHAR(500) NOT NULL,
+filesize INTEGER NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-\`\`\`
+```
 
 ---
 
@@ -70,32 +71,38 @@ CREATE TABLE documents (
 To scale from a single-user demo to 1,000 users, I would implement:
 
 #### 1. User Authentication & Authorization
+
 - Add user registration/login (JWT or session-based)
 - Implement user_id foreign key in documents table
 - Add Row Level Security to ensure users only access their own documents
 
 #### 2. Database Scaling
+
 - Migrate to PostgreSQL with connection pooling
 - Add indexes on frequently queried columns (user_id, created_at)
 - Implement database replicas for read scaling
 
 #### 3. File Storage
+
 - Move from local storage to cloud object storage (AWS S3, Google Cloud Storage, or Vercel Blob)
 - Implement signed URLs for secure file access
 - Add CDN for faster file downloads
 
 #### 4. Performance Optimizations
+
 - Implement caching layer (Redis) for frequently accessed metadata
 - Add pagination for document lists
 - Implement file compression and thumbnail generation
 
 #### 5. Infrastructure
+
 - Containerize application (Docker)
 - Deploy on Kubernetes or serverless platform
 - Add load balancing and auto-scaling
 - Implement rate limiting to prevent abuse
 
 #### 6. Security Enhancements
+
 - Add virus scanning for uploaded files
 - Implement file encryption at rest
 - Add audit logging for compliance (HIPAA)
@@ -107,56 +114,7 @@ To scale from a single-user demo to 1,000 users, I would implement:
 
 ### System Architecture Diagram
 
-\`\`\`
-┌─────────────────────────────────────────────────────────────────┐
-│                        CLIENT BROWSER                           │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │                  Next.js Frontend                        │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │   │
-│  │  │   Upload    │  │  Document   │  │     Header      │  │   │
-│  │  │   Form      │  │    List     │  │   Component     │  │   │
-│  │  └──────┬──────┘  └──────┬──────┘  └─────────────────┘  │   │
-│  │         │                │                               │   │
-│  │         └────────┬───────┘                               │   │
-│  │                  │                                        │   │
-│  │         ┌────────▼────────┐                               │   │
-│  │         │    SWR Cache    │                               │   │
-│  │         └────────┬────────┘                               │   │
-│  └──────────────────┼───────────────────────────────────────┘   │
-│                     │ HTTP Requests                              │
-└─────────────────────┼───────────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      NEXT.JS SERVER                              │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │                    API Routes                             │    │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐   │    │
-│  │  │ POST        │  │ GET         │  │ GET/DELETE      │   │    │
-│  │  │ /upload     │  │ /documents  │  │ /documents/:id  │   │    │
-│  │  └──────┬──────┘  └──────┬──────┘  └────────┬────────┘   │    │
-│  │         └─────────────────┼─────────────────┘            │    │
-│  │                           │                               │    │
-│  │                  ┌────────▼────────┐                      │    │
-│  │                  │  Database Layer │                      │    │
-│  │                  │    (lib/db.ts)  │                      │    │
-│  │                  └────────┬────────┘                      │    │
-│  └───────────────────────────┼──────────────────────────────┘    │
-│                              │                                    │
-│           ┌──────────────────┴──────────────────┐                │
-│           ▼                                      ▼                │
-│  ┌─────────────────┐                   ┌─────────────────┐       │
-│  │    Documents    │                   │   File Storage  │       │
-│  │   (Metadata)    │                   │  (Base64 Data)  │       │
-│  │                 │                   │                 │       │
-│  │ • id            │                   │ • id → content  │       │
-│  │ • filename      │                   │                 │       │
-│  │ • filepath      │                   │                 │       │
-│  │ • filesize      │                   │                 │       │
-│  │ • created_at    │                   │                 │       │
-│  └─────────────────┘                   └─────────────────┘       │
-└─────────────────────────────────────────────────────────────────┘
-\`\`\`
+See the visual architecture diagram in `/public/architecture-diagram.jpg` for a complete overview of the system components and data flow.
 
 ### Data Flow Summary
 
@@ -172,21 +130,23 @@ To scale from a single-user demo to 1,000 users, I would implement:
 
 ### Endpoint 1: Upload a PDF
 
-| Property | Value |
-|----------|-------|
-| **URL** | `/api/documents/upload` |
-| **Method** | `POST` |
-| **Content-Type** | `multipart/form-data` |
-| **Description** | Uploads a PDF file and stores its metadata |
+| Property         | Value                                      |
+| ---------------- | ------------------------------------------ |
+| **URL**          | `/api/documents/upload`                    |
+| **Method**       | `POST`                                     |
+| **Content-Type** | `multipart/form-data`                      |
+| **Description**  | Uploads a PDF file and stores its metadata |
 
 **Request:**
-\`\`\`bash
+
+```bash
 curl -X POST http://localhost:3000/api/documents/upload \
-  -F "file=@prescription.pdf"
-\`\`\`
+ -F "file=@prescription.pdf"
+```
 
 **Success Response (201):**
-\`\`\`json
+
+```json
 {
   "message": "File uploaded successfully",
   "document": {
@@ -197,32 +157,35 @@ curl -X POST http://localhost:3000/api/documents/upload \
     "created_at": "2024-12-11T10:30:00.000Z"
   }
 }
-\`\`\`
+```
 
 **Error Response (400):**
-\`\`\`json
+
+```json
 {
   "error": "Only PDF files are allowed"
 }
-\`\`\`
+```
 
 ---
 
 ### Endpoint 2: List All Documents
 
-| Property | Value |
-|----------|-------|
-| **URL** | `/api/documents` |
-| **Method** | `GET` |
+| Property        | Value                                                          |
+| --------------- | -------------------------------------------------------------- |
+| **URL**         | `/api/documents`                                               |
+| **Method**      | `GET`                                                          |
 | **Description** | Retrieves all uploaded documents sorted by date (newest first) |
 
 **Request:**
-\`\`\`bash
+
+```bash
 curl http://localhost:3000/api/documents
-\`\`\`
+```
 
 **Success Response (200):**
-\`\`\`json
+
+```json
 {
   "documents": [
     {
@@ -241,65 +204,71 @@ curl http://localhost:3000/api/documents
     }
   ]
 }
-\`\`\`
+```
 
 ---
 
 ### Endpoint 3: Download a File
 
-| Property | Value |
-|----------|-------|
-| **URL** | `/api/documents/:id` |
-| **Method** | `GET` |
+| Property        | Value                               |
+| --------------- | ----------------------------------- |
+| **URL**         | `/api/documents/:id`                |
+| **Method**      | `GET`                               |
 | **Description** | Downloads a specific document by ID |
 
 **Request:**
-\`\`\`bash
+
+```bash
 curl http://localhost:3000/api/documents/550e8400-e29b-41d4-a716-446655440000 \
-  --output downloaded_file.pdf
-\`\`\`
+ --output downloaded_file.pdf
+```
 
 **Success Response (200):**
+
 - Returns the PDF file as binary data
 - Headers include:
   - `Content-Type: application/pdf`
   - `Content-Disposition: attachment; filename="prescription.pdf"`
 
 **Error Response (404):**
-\`\`\`json
+
+```json
 {
   "error": "Document not found"
 }
-\`\`\`
+```
 
 ---
 
 ### Endpoint 4: Delete a File
 
-| Property | Value |
-|----------|-------|
-| **URL** | `/api/documents/:id` |
-| **Method** | `DELETE` |
+| Property        | Value                                    |
+| --------------- | ---------------------------------------- |
+| **URL**         | `/api/documents/:id`                     |
+| **Method**      | `DELETE`                                 |
 | **Description** | Deletes a specific document and its file |
 
 **Request:**
-\`\`\`bash
+
+```bash
 curl -X DELETE http://localhost:3000/api/documents/550e8400-e29b-41d4-a716-446655440000
-\`\`\`
+```
 
 **Success Response (200):**
-\`\`\`json
+
+```json
 {
   "message": "Document deleted successfully"
 }
-\`\`\`
+```
 
 **Error Response (404):**
-\`\`\`json
+
+```json
 {
   "error": "Document not found"
 }
-\`\`\`
+```
 
 ---
 
@@ -311,35 +280,42 @@ curl -X DELETE http://localhost:3000/api/documents/550e8400-e29b-41d4-a716-44665
 
 1. **User Selection**: User selects a PDF file via the drag-and-drop zone or file picker.
 
-2. **Client-Side Validation**: 
+2. **Client-Side Validation**:
+
    - JavaScript validates file type (must be `application/pdf`)
    - Checks file size (must be ≤ 10MB)
    - Displays error message if validation fails
 
-3. **FormData Creation**: 
+3. **FormData Creation**:
+
    - File is wrapped in a FormData object
    - UI shows "Uploading..." state
 
-4. **HTTP Request**: 
+4. **HTTP Request**:
+
    - Frontend sends POST request to `/api/documents/upload`
    - File is sent as multipart/form-data
 
 5. **Server-Side Validation**:
+
    - API route validates file existence
    - Validates MIME type again (security)
    - Validates file size
 
 6. **File Processing**:
+
    - File content is read as ArrayBuffer
    - Converted to Base64 for storage
    - Unique filename generated with timestamp
 
 7. **Database Storage**:
+
    - Metadata (filename, size, path) stored in documents table
    - File content stored separately (in memory or filesystem)
    - UUID generated for document ID
 
 8. **Response**:
+
    - Success response sent with document metadata
    - Frontend receives response and shows success message
 
@@ -361,10 +337,12 @@ curl -X DELETE http://localhost:3000/api/documents/550e8400-e29b-41d4-a716-44665
 4. **File Retrieval**: Server fetches file content from storage.
 
 5. **Response Preparation**:
+
    - Sets appropriate headers (Content-Type, Content-Disposition)
    - Streams file content in response body
 
 6. **Browser Handling**:
+
    - Browser receives binary data
    - Creates Blob URL from response
    - Triggers download with original filename
@@ -378,42 +356,50 @@ curl -X DELETE http://localhost:3000/api/documents/550e8400-e29b-41d4-a716-44665
 ### Q6. What assumptions did you make while building this?
 
 #### 1. Single User System
+
 - No authentication required (as per assignment instructions)
 - All documents belong to a single implicit user
 - No need for user management or access control
 
 #### 2. File Constraints
+
 - **Maximum file size**: 10MB per document
 - **File type**: Only PDF files accepted
 - **Filename**: Original filename preserved, with timestamp prefix for uniqueness
 - **No file versioning**: Same file uploaded twice creates separate entries
 
 #### 3. Storage
+
 - **Demo mode**: Files stored in memory (lost on server restart)
 - **Production assumption**: Would use persistent storage (filesystem or cloud)
 - **No file compression**: Files stored as-is
 
 #### 4. Concurrent Access
+
 - **Single server**: No distributed caching concerns
 - **Eventual consistency**: SWR handles client-side caching
 - **No transaction locks**: Simple CRUD operations assumed
 
 #### 5. Browser Compatibility
+
 - Modern browser required (ES6+ support)
 - File API and Drag-and-Drop API available
 - JavaScript enabled
 
 #### 6. Security
+
 - **No encryption**: Files stored without encryption (demo only)
 - **No virus scanning**: Trust that users upload safe files
 - **No HIPAA compliance**: Production system would need additional security measures
 
 #### 7. Performance
+
 - **No pagination**: Assumes reasonable number of documents (<1000)
 - **No lazy loading**: All documents fetched at once
 - **No image thumbnails**: PDFs displayed as icons only
 
 #### 8. Error Handling
+
 - **Graceful degradation**: UI shows error messages on failure
 - **No automatic retry**: User must manually retry failed operations
 - **No offline support**: Requires active internet connection

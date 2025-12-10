@@ -28,7 +28,7 @@ This patient portal allows users to manage their medical documents (prescription
 
 ## Screenshots
 
-![Patient Portal UI](project-preview.jpg)
+![Patient Portal UI](./public/project-preview.jpg)
 
 _Upload and manage your medical documents with ease_
 
