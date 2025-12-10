@@ -22,6 +22,16 @@ This patient portal allows users to manage their medical documents (prescription
 | Database      | In-memory storage (demo) / SQLite (production) |
 | Data Fetching | SWR                                            |
 
+## 🚀 Live Demo
+
+**Deployed Link:** [Patient Portal Live](https://patient-portal-pranjal.vercel.app)
+
+## Screenshots
+
+![Patient Portal UI](project-preview.jpg)
+
+_Upload and manage your medical documents with ease_
+
 ## Project Structure
 
 ```
